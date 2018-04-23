@@ -62,7 +62,7 @@ class Network:
             if x == 0:
                 self.network=np.append(self.network,Layer("layer%s" %(x + 1), self.numberNeuronsPer[x].astype(np.int64), numberParameters))
             else:
-                self.network = np.append(self.network, Layer("layer%s" %(x + 1), self.numberNeuronsPer[x].astype(np.int64), self.numberNeuronsPer[x-1].astype(np.int64)))
+                self.network = np.append(self.network, Layer("layer%s" %(x + 1), self.numberNeuronsPer[x].astype(np.int64), self.numberNeuronsPer[x-1].astype(np.int64))) 
 
         self.network=np.append(self.network, Layer("output",numberOutputs,self.numberNeuronsPer[-1].astype(np.int64)))
 

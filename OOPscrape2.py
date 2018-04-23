@@ -4,10 +4,9 @@ import requests
 from datetime import datetime
 from bs4 import BeautifulSoup
 import time
-import winsound
 import webbrowser
-#from collectStockData_forNeuralNet import main
-#from neuralNet2 import computeEstimatedMove
+from collectStockData_forNeuralNet import main
+from neuralNet2 import computeEstimatedMove
 import numpy as np
 
 class Site:
@@ -20,7 +19,6 @@ class Site:
         self.number_tag=number_tag
         self.ticker=ticker
         self.fails = 0
-
  # FINDING TOOL
     def findnth(self, haystack, needle, n):
         parts = haystack.split(needle, n + 1)
@@ -101,12 +99,13 @@ class Site:
         Freq = 300  # Set Frequency To 2500 Hertz
         Dur = 200  # Set Duration To 1000 ms == 1 second
         timeNOW=datetime.now()
+
         if self.newHeadline not in self.oldArray:
             print self.name
             print self.newHeadline
 
             if "UPDATE" or "Update" or "update" not in self.newHeadline:
-                winsound.Beep(Freq, Dur)
+                print "\a"
 
             if self.ticker == True:
                 if self.name=="Citron":
@@ -117,13 +116,13 @@ class Site:
                     ticker = self.spruceTicker()
                 print ticker
 
-                #dataVector = main(self.name,ticker)
-                #computeEstimatedMove(dataVector)
+                dataVector = main(self.name,ticker)
+                computeEstimatedMove(dataVector)
 
             webbrowser.get("windows-default").open(self.viewing_url, new=0, autoraise=True)
 
             time.sleep(10)
-            print timeNOW   #Helpful to check the performace of the scraper, and speed of me entering orders
+            print timeNOW
 
     def getsite(self):
         self.header = {
@@ -155,12 +154,12 @@ class Site:
                     #print self.fails
                     self.fails=0
                 continue
-
+            #print self.name
             self.soup = BeautifulSoup(self.response.content, "html.parser")
             try:
                 self.newHeadline = self.soup.find_all(self.tag)[self.number_tag].text
             except IndexError:
-                self.newHeadline=self.oldArray[5]
+                self.newHeadline=self.oldArray[-1]
             if self.name=="NYPost":
                 if Site.keywordCheck(self)==True:
                     Site.check_action(self)
@@ -171,19 +170,19 @@ class Site:
             if self.loops>6:
                 del self.oldArray[0]
 
-
+            #print self.newHeadline
 
 
 citron=Site("Citron","http://citronresearch.com/feed","http://citronresearch.com","title",1,True)
 muddywaters=Site("Muddywaters","http://www.muddywatersresearch.com/research/","http://www.muddywatersresearch.com/research/","a",10,False)
-prescience=Site("Prescience","http://www.presciencepoint.com/feed/", "http://www.presciencepoint.com/research/","title",2,True)
+prescience=Site("Prescience","http://www.presciencepoint.com/feed/", "http://www.presciencepoint.com/research/","title",1,True)
 gotham=Site("Gotham","http://gothamcityresearch.com/research/feed","http://gothamcityresearch.com/research",'title',2,False)
 bronte=Site("Bronte","http://brontecapital.blogspot.com/","http://brontecapital.blogspot.com/",'a',1,False)
 spruce=Site("Sprucepoint","http://www.sprucepointcap.com/feed/","http://www.sprucepointcap.com/research/",'title', 1, True)
 sirf=Site("Sirf","http://sirf-online.org/feed","http://sirf-online.org",'title',1,False)
 nypost=Site("NYPost","http://nypost.com/feed/","nypost.com","title",2,False)
 
-All=[citron,muddywaters,prescience,bronte,spruce, nypost]  #gotham getting stuck, bad reports
+All=[ citron, prescience, spruce] #  #gotham bronte,citron,, nypost muddywaters citron,
 
 threads=[]
 for item in All:
